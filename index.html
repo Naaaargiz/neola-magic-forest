@@ -1,699 +1,105 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Neola: The Enchanted Forest</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#10152b">
+<title>NEOLA: The Enchanted Realms — Final Edition</title>
 <style>
-*{box-sizing:border-box}
-body{
-  margin:0;background:#10152b;color:white;
-  font-family:system-ui,Arial,sans-serif;
-  display:flex;justify-content:center;min-height:100vh;
-}
-#app{width:min(100%,1000px);padding:14px}
-h1{text-align:center;margin:5px;color:#d9c5ff}
-#hud{
- display:flex;justify-content:space-between;gap:8px;
- flex-wrap:wrap;padding:10px;background:#222746;
- border-radius:12px;margin-bottom:10px
-}
-#gamebox{position:relative;width:100%}
-canvas{
- width:100%;display:block;background:#203d36;
- border:3px solid #7868a8;border-radius:12px;
- image-rendering:pixelated
-}
-#message{
- position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);
- text-align:center;width:90%;font-size:20px;font-weight:bold;
- text-shadow:0 2px 5px black;pointer-events:none
-}
-#help{color:#d5d8ef;font-size:13px;line-height:1.6;margin:10px 0}
-button{
- border:0;border-radius:10px;padding:10px 14px;
- background:#8065bd;color:white;font-weight:bold;cursor:pointer;
-}
-button:hover{background:#9b7bd9}
-#controls{
- display:none;grid-template-columns:repeat(3,58px);
- gap:6px;justify-content:center;margin:12px auto
-}
-#controls button{height:48px;padding:4px;font-size:18px}
-#controls .wide{grid-column:span 3}
-@media(max-width:650px){
- #controls{display:grid}
- #hud{font-size:13px}
-}
-</style>
-</head>
-<body>
-<div id="app">
-<h1>✨ Neola: The Enchanted Forest ✨</h1>
+:root{--glass:rgba(23,27,57,.82);--line:rgba(213,200,255,.2);--gold:#ffe6a1;--lav:#d9c7ff;--mint:#9fffe1}*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(ellipse at 50% -10%,#4a2f72 0,#17162f 46%,#090d1c 100%);color:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overscroll-behavior:none}body{padding:clamp(8px,2vw,20px);padding-bottom:max(10px,env(safe-area-inset-bottom))}button{font:inherit;color:inherit;border:1px solid var(--line);background:linear-gradient(145deg,#38315f,#252746);border-radius:14px;padding:10px 14px;font-weight:750;cursor:pointer;touch-action:manipulation;box-shadow:0 5px 15px #0002}button:active{transform:translateY(1px) scale(.98)}button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}.app{width:min(1120px,100%);margin:auto}.header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 auto 12px}.logo{display:flex;align-items:center;gap:12px}.logoIcon{width:46px;height:46px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(145deg,#f5d99b,#b78af3 55%,#6b70d9);font-size:25px;box-shadow:0 5px 24px #a78bfa40}.logo h1{font-size:clamp(18px,3vw,27px);margin:0;letter-spacing:.2px}.sub{display:none}.headerActions{display:flex;gap:8px}.iconBtn{min-width:42px;padding:9px}.hud{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:10px}.stat{padding:10px 13px;border:1px solid var(--line);border-radius:16px;background:var(--glass);backdrop-filter:blur(12px);min-width:0}.statLabel{font-size:11px;color:#bcb9db;letter-spacing:.5px}.statValue{font-weight:850;font-size:clamp(15px,2.4vw,21px);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.healthTrack{height:5px;background:#4b2947;border-radius:10px;margin-top:7px;overflow:hidden}.healthFill{height:100%;width:100%;background:linear-gradient(90deg,#ff6f9f,#ffb4cf);transition:width .2s}.stage{position:relative;overflow:hidden;border:1px solid #c9a9ff77;border-radius:22px;background:#151a2f;box-shadow:0 20px 65px #0008,0 0 30px #a78bfa18}.stageTop{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 14px;background:linear-gradient(100deg,#33264f,#20213d 60%,#26334b);border-bottom:1px solid var(--line)}.stageName{font-weight:800}.stageHint{font-size:12px;color:#c5c1e1;text-align:right}canvas{display:block;width:100%;height:auto;aspect-ratio:16/10;touch-action:none;background:#1e3540}.stageBottom{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;background:#171b35;border-top:1px solid var(--line);font-size:13px;color:#d6d2f0}.message{min-height:20px}.pill{white-space:nowrap;padding:5px 9px;border-radius:99px;background:#353052;color:#f5e5a8;font-size:11px}.below{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:12px;margin-top:12px}.quest{border:1px solid var(--line);border-radius:16px;background:var(--glass);padding:12px 14px;min-width:0}.questTitle{font-weight:800;margin-bottom:5px}.questText{font-size:13px;color:#c5c5df;line-height:1.5}.desktopHelp{display:none}.key{display:inline-block;padding:1px 6px;border:1px solid #66628b;border-radius:5px;background:#282847;color:#f8f3ff;font-weight:800}.mobileControls{display:none;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;touch-action:none}.pad{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,50px);gap:6px;max-width:240px}.pad button{padding:0;font-size:20px;min-width:0;border-radius:13px;background:linear-gradient(145deg,#37315f,#232542)}.pad .up{grid-column:2;grid-row:1}.pad .left{grid-column:1;grid-row:2}.pad .down{grid-column:2;grid-row:2}.pad .right{grid-column:3;grid-row:2}.actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;align-content:center}.actions button{min-height:47px;font-size:13px;padding:7px}.attackBtn{background:linear-gradient(145deg,#7857c6,#503b90)}.dashBtn{background:linear-gradient(145deg,#2f8b9c,#245b7b)}.modalWrap{position:fixed;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(8,10,25,.76);backdrop-filter:blur(10px)}.modal{width:min(520px,100%);padding:clamp(22px,5vw,36px);border-radius:26px;border:1px solid #c7b5ff55;background:radial-gradient(ellipse at top,#38305d,#171b35 70%);box-shadow:0 25px 90px #0009;text-align:center}.hero{font-size:clamp(42px,10vw,66px);filter:drop-shadow(0 5px 20px #a78bfa55)}.modal h2{font-size:clamp(25px,6vw,36px);margin:7px 0;color:var(--gold)}.modal p{color:#d1cee9;line-height:1.65;font-size:14px}.primary{width:100%;margin-top:8px;padding:14px;background:linear-gradient(120deg,#fff0bd,#e4b5ff 55%,#a9c7ff);border:0;color:#26213c;font-size:16px}.modalNote{display:none!important}.levelGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0}.levelCard{padding:11px 5px;border-radius:13px;background:#252744;border:1px solid #ffffff16;font-size:12px}.levelCard strong{display:block;font-size:17px;margin-bottom:3px}.levelCard.locked{opacity:.38}.hide{display:none!important}@media(max-width:650px){body{padding:9px;padding-bottom:max(9px,env(safe-area-inset-bottom))}.header{margin-bottom:9px}.logoIcon{width:40px;height:40px;border-radius:13px}.sub{font-size:10px}.hud{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}.stat{padding:8px 9px;border-radius:13px}.statLabel{font-size:9px}.statValue{font-size:14px}.healthTrack{margin-top:5px}.stage{border-radius:17px}.stageTop{padding:8px 10px}.stageHint{font-size:10px}.stageBottom{padding:8px 10px;font-size:11px}.below{grid-template-columns:1fr;margin-top:8px}.quest{padding:10px 12px}.desktopHelp{display:none}.mobileControls{display:grid}.pad{grid-template-rows:repeat(2,48px);gap:5px}.actions button{min-height:46px}.headerActions button{padding:7px 9px}.levelGrid{gap:6px}.levelCard{padding:9px 3px}}@media(max-width:380px){.hud{grid-template-columns:repeat(3,minmax(0,1fr))}.stageHint{max-width:45%}.pad{grid-template-rows:repeat(2,44px)}.actions button{font-size:12px}}
+</style></head>
+<body><main class="app">
+<header class="header"><div class="logo"><div class="logoIcon">✦</div><div><h1>NEOLA <span style="color:#c5b3ff">THE ENCHANTED REALMS</span></h1></div></div><div class="headerActions"><button class="iconBtn" id="levelsBtn" title="Realm Map">🗺️</button><button class="iconBtn" id="soundBtn" title="Sound">🔊</button><button class="iconBtn" id="pauseBtn" title="Pause">Ⅱ</button></div></header>
+<section class="hud"><div class="stat"><div class="statLabel">REALM</div><div class="statValue" id="levelText">01 / 12</div></div><div class="stat"><div class="statLabel">HEALTH</div><div class="statValue" id="hpText">❤️❤️❤️</div><div class="healthTrack"><div class="healthFill" id="healthFill"></div></div></div><div class="stat"><div class="statLabel">CRYSTALS</div><div class="statValue" id="crystalText">💎 0 / 5</div></div><div class="stat"><div class="statLabel">SHOTS</div><div class="statValue" id="magicText">✨ 10</div></div><div class="stat"><div class="statLabel">BOMBS</div><div class="statValue" id="bombText">💣 3</div></div></section>
+<section class="stage"><div class="stageTop"><div class="stageName" id="realmName">🌲 Whispering Woods</div><div class="stageHint" id="goalText">Gather crystals to open the portal</div></div><canvas id="game" width="960" height="600" aria-label="Neola Enchanted Realms game"></canvas><div class="stageBottom"><div class="message" id="message">✨ Your adventure awaits...</div><div class="pill" id="itemPill">Items: None</div></div></section>
+<div class="below"><div class="quest"><div class="questTitle">✦ YOUR QUEST</div><div class="questText" id="questText">Gather every crystal, evade the creatures, and reach the portal.</div></div><button id="bombBtn">💣 Bomb (B)</button><button id="restartBtn">↻ Restart</button></div>
+<div class="mobileControls" id="mobileControls"><div class="pad"><button class="up" data-dir="up" aria-label="Move up">▲</button><button class="left" data-dir="left" aria-label="Move left">◀</button><button class="down" data-dir="down" aria-label="Move down">▼</button><button class="right" data-dir="right" aria-label="Move right">▶</button></div><div class="actions"><button class="attackBtn" id="touchAttack">🔮 Cast Spell</button><button class="dashBtn" id="touchDash">⚡ Dash</button><button id="touchPotion">❤️ Use Potion</button><button id="touchShield">🛡️ Shield</button><button id="touchBomb">💣 Bomb</button></div></div>
 
-<div id="hud">
- <span id="level">Realm 1 / 8</span>
- <span id="hp">❤️❤️❤️</span>
- <span id="crystals">💎 0 / 5</span>
- <span id="magic">🔮 0</span>
- <span id="inventory">Items: —</span>
- <button id="restart">Restart</button>
-</div>
-
-<div id="gamebox">
- <canvas id="game" width="800" height="520"></canvas>
- <div id="message"></div>
-</div>
-
-<div id="controls">
- <span></span><button data-key="ArrowUp">▲</button><span></span>
- <button data-key="ArrowLeft">◀</button>
- <button data-key="ArrowDown">▼</button>
- <button data-key="ArrowRight">▶</button>
- <button class="wide" data-key="f">🔮 Magic Attack</button>
- <button class="wide" data-key=" ">⚡ Dash</button>
-</div>
-
-<div id="help">
- <b>Move:</b> WASD / Arrow Keys &nbsp;
- <b>Dash:</b> Space / Shift &nbsp;
- <b>Attack:</b> F or click the game &nbsp;
- <b>Collect:</b> Walk over items and crystals.<br>
- Defeat enemies, collect enough crystals, and enter the glowing portal.
- Enemies become faster in later realms!
-</div>
-</div>
-
+</main>
+<div class="modalWrap" id="homeModal"><div class="modal"><div class="hero">🌙🌲✨</div><h2>Neola: The Enchanted Realms</h2><p>Explore enchanted worlds, gather crystals, master powerful magic, and face the ancient Dragon of the Forest.</p><button class="primary" id="startBtn">Enter the Realms ✦</button></div></div>
+<div class="modalWrap hide" id="levelModal"><div class="modal"><div class="hero">🗺️</div><h2>Realm Map</h2><p>Unlock new realms as you progress.</p><div class="levelGrid" id="levelGrid"></div><button class="primary" id="closeLevels">Back to Adventure</button></div></div>
+<div class="modalWrap hide" id="pauseModal"><div class="modal"><div class="hero">🌙</div><h2 id="pauseTitle">Adventure Paused</h2><p id="pauseDesc">Take a breath. The realms will be waiting.</p><button class="primary" id="resumeBtn">Resume</button><button style="width:100%;margin-top:8px" id="pauseRestart">Restart Realm</button></div></div>
 <script>
-"use strict";
-
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
-const W = canvas.width, H = canvas.height;
-
-const $ = id => document.getElementById(id);
-
-const realms = [
- {name:"Whispering Woods",bg:"#254b3c",wall:"#386b4b",need:5,foes:3},
- {name:"Moonlit Marsh",bg:"#243c55",wall:"#375c70",need:6,foes:4},
- {name:"Crystal Caverns",bg:"#3b285c",wall:"#624b8b",need:7,foes:5},
- {name:"Shadow Kingdom",bg:"#29283e",wall:"#494363",need:8,foes:6},
- {name:"Frostveil Peaks",bg:"#31536a",wall:"#7098b1",need:9,foes:7},
- {name:"Ember Ruins",bg:"#542d2b",wall:"#904b37",need:10,foes:8},
- {name:"Dream Labyrinth",bg:"#3c285c",wall:"#70519a",need:11,foes:9},
- {name:"The Heart of Magic",bg:"#39233d",wall:"#a04e83",need:12,foes:1}
+(()=>{'use strict';
+const $=id=>document.getElementById(id),canvas=$('game'),ctx=canvas.getContext('2d');
+const realms=[
+{name:'Whispering Woods',emoji:'🌲',bg:'#193d38',accent:'#62bd8b',crystals:5,foes:3,need:0},
+{name:'Moonlit Marsh',emoji:'🌙',bg:'#1d314b',accent:'#75c6ed',crystals:6,foes:4,need:1},
+{name:'Crystal Caverns',emoji:'💎',bg:'#30244e',accent:'#b99aff',crystals:7,foes:5,need:1},
+{name:'Shadow Kingdom',emoji:'🌑',bg:'#24243b',accent:'#a59bff',crystals:8,foes:6,need:1},
+{name:'Frostveil Peaks',emoji:'❄️',bg:'#254354',accent:'#a9e9ff',crystals:8,foes:7,need:1},
+{name:'Ember Ruins',emoji:'🔥',bg:'#482b2b',accent:'#ff9c72',crystals:9,foes:8,need:1},
+{name:'Dream Labyrinth',emoji:'🌀',bg:'#38234f',accent:'#e7a7ff',crystals:10,foes:9,need:1},
+{name:'Starlight Coast',emoji:'🌊',bg:'#173c50',accent:'#7de7df',crystals:10,foes:9,need:1},
+{name:'Luminous Jungle',emoji:'🍄',bg:'#1e423b',accent:'#c1f47d',crystals:11,foes:10,need:1},
+{name:'Sky Temple',emoji:'☁️',bg:'#293a59',accent:'#ffe2a1',crystals:11,foes:11,need:1},
+{name:'Chaos Rift',emoji:'🪄',bg:'#3b2346',accent:'#ff9de1',crystals:12,foes:12,need:1},
+{name:'Heart of Magic',emoji:'🐉',bg:'#321f3d',accent:'#ffb3dd',crystals:12,foes:0,need:1}
 ];
-
-let level, player, enemies, gems, flowers, drops, shots, portal;
-let walls, particles, keys = {};
-let gameState = "playing";
-let lastTime = 0;
-let messageTimer = 0;
-let boss = null;
-
-function rand(a,b){return a+Math.random()*(b-a)}
-function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
-function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
-function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
-
-function newPlayer(){
- return {
-  x:65,y:H/2,size:17,hp:3,maxHp:3,
-  speed:2.5,magic:0,crystals:0,flowers:0,
-  faceX:1,faceY:0,invuln:0,
-  dash:0,dashCooldown:0,
-  speedUntil:0,shieldUntil:0,
-  attackCooldown:0
- };
-}
-
-function showMessage(text,seconds=2){
- $("message").textContent=text;
- messageTimer=seconds;
-}
-
-function makeWalls(){
- walls=[];
- // Decorative obstacle layout; leave paths between areas.
- const count=5+level;
- for(let i=0;i<count;i++){
-  const x=rand(140,W-150), y=rand(45,H-45);
-  const ww=rand(28,65), hh=rand(25,58);
-  if(Math.abs(x-65)<100 || Math.abs(x-(W-65))<100)continue;
-  walls.push({x,y,w:ww,h:hh});
- }
-}
-
-function blocked(x,y,r){
- if(x-r<0||x+r>W||y-r<0||y+r>H)return true;
- return walls.some(w=>
-  x+r>w.x&&x-r<w.x+w.w&&
-  y+r>w.y&&y-r<w.y+w.h
- );
-}
-
-function moveEntity(e,dx,dy,r){
- if(!blocked(e.x+dx,e.y,r))e.x+=dx;
- if(!blocked(e.x,e.y+dy,r))e.y+=dy;
-}
-
-function safePosition(minDistance=100){
- let p;
- for(let i=0;i<100;i++){
-  p={x:rand(45,W-45),y:rand(45,H-45)};
-  if(!blocked(p.x,p.y,18)&&dist(p,player)>minDistance)return p;
- }
- return {x:W/2,y:H/2};
-}
-
-function makeLevel(n){
- level=n;
- gameState="playing";
- player=newPlayer();
- enemies=[];gems=[];flowers=[];drops=[];shots=[];particles=[];
- boss=null;
- makeWalls();
-
- for(let i=0;i<realms[level].need;i++){
-  const p=safePosition(140);
-  gems.push({...p,r:9,bob:rand(0,6)});
- }
- for(let i=0;i<3+level;i++){
-  const p=safePosition(120);
-  flowers.push({...p,r:8,bob:rand(0,6)});
- }
-
- if(level<7){
-  for(let i=0;i<realms[level].foes;i++)spawnEnemy(false);
- }else{
-  const p=safePosition(240);
-  boss={...p,x:p.x,y:p.y,r:29,hp:14,maxHp:14,
-        speed:0.8,attackTimer:0,flash:0};
- }
-
- portal={x:W-55,y:H/2,r:24,open:false};
- showMessage(realms[level].name,2.4);
- updateHUD();
-}
-
-function spawnEnemy(isBoss=false,x=null,y=null){
- const p=(x===null)?safePosition(150):{x,y};
- enemies.push({
-  x:p.x,y:p.y,r:isBoss?24:15,
-  hp:isBoss?5:2,maxHp:isBoss?5:2,
-  speed:(0.7+level*0.13)*rand(0.85,1.15),
-  active:false,patrol:rand(0,6),
-  attackTimer:0,flash:0
- });
-}
-
-function spawnDrop(x,y){
- // 50% chance of a random drop after a normal enemy is defeated.
- if(Math.random()>=0.5)return;
- const r=Math.random();
- let type;
- if(r<0.25)type="health";
- else if(r<0.48)type="speed";
- else if(r<0.78)type="magic";
- else if(r<0.94)type="shield";
- else type="crystal";
-
- drops.push({x,y,type,r:12,bob:rand(0,6),life:18});
-}
-
-const itemInfo={
- health:{emoji:"❤️",name:"Health Potion"},
- speed:{emoji:"⚡",name:"Speed Potion"},
- magic:{emoji:"🔮",name:"Magic Orb"},
- shield:{emoji:"🛡️",name:"Magic Shield"},
- crystal:{emoji:"💎",name:"Bonus Crystals"}
-};
-
-function collectDrop(item){
- switch(item.type){
-  case "health":
-   player.hp=Math.min(player.maxHp,player.hp+1);
-   showMessage("❤️ Health restored!");
-   break;
-  case "speed":
-   player.speedUntil=performance.now()+5000;
-   showMessage("⚡ Speed boost: 5 seconds!");
-   break;
-  case "magic":
-   player.magic+=1;
-   showMessage("🔮 Magic Orb collected!");
-   break;
-  case "shield":
-   player.shieldUntil=performance.now()+5000;
-   showMessage("🛡️ Shield activated!");
-   break;
-  case "crystal":
-   player.crystals+=3;
-   showMessage("💎 Bonus: +3 crystals!");
-   break;
- }
- updateHUD();
-}
-
-function damagePlayer(amount=1){
- const now=performance.now();
- if(player.invuln>0 || now<player.shieldUntil)return;
- player.hp-=amount;
- player.invuln=1.1;
- burst(player.x,player.y,"#ff7b9b",12);
- if(player.hp<=0){
-  player.hp=0;
-  gameState="dead";
-  showMessage("You were caught! Press Restart to try again.",999);
- }else{
-  showMessage("Ouch! Watch out for the monsters!",1.2);
- }
- updateHUD();
-}
-
-function defeatEnemy(e){
- spawnDrop(e.x,e.y);
- burst(e.x,e.y,"#d7b7ff",14);
-}
-
-function burst(x,y,color,n){
- for(let i=0;i<n;i++){
-  particles.push({
-   x,y,vx:rand(-2.5,2.5),vy:rand(-2.5,2.5),
-   life:rand(0.25,0.7),color
-  });
- }
-}
-
-function attack(){
- if(gameState!=="playing"||player.magic<=0||player.attackCooldown>0)return;
- player.magic--;
- player.attackCooldown=0.3;
-
- let target=null,best=Infinity;
- const targets=[...enemies.filter(e=>e.hp>0)];
- if(boss&&boss.hp>0)targets.push(boss);
-
- for(const e of targets){
-  const d=dist(player,e);
-  if(d<best){best=d;target=e}
- }
- if(!target){
-  showMessage("No monsters nearby!",1);
-  return;
- }
- const dx=target.x-player.x,dy=target.y-player.y;
- const len=Math.hypot(dx,dy)||1;
- shots.push({
-  x:player.x,y:player.y,
-  vx:dx/len*6,vy:dy/len*6,
-  r:7,life:1.5
- });
-}
-
-function dash(){
- if(gameState!=="playing"||player.dashCooldown>0)return;
- player.dash=0.18;
- player.dashCooldown=1.1;
- player.invuln=Math.max(player.invuln,0.22);
-}
-
-function update(dt,now){
- if(gameState!=="playing")return;
-
- player.invuln=Math.max(0,player.invuln-dt);
- player.dash=Math.max(0,player.dash-dt);
- player.dashCooldown=Math.max(0,player.dashCooldown-dt);
- player.attackCooldown=Math.max(0,player.attackCooldown-dt);
-
- let dx=0,dy=0;
- if(keys.ArrowLeft||keys.a||keys.A)dx--;
- if(keys.ArrowRight||keys.d||keys.D)dx++;
- if(keys.ArrowUp||keys.w||keys.W)dy--;
- if(keys.ArrowDown||keys.s||keys.S)dy++;
-
- const len=Math.hypot(dx,dy)||1;
- if(dx||dy){
-  dx/=len;dy/=len;
-  player.faceX=dx;player.faceY=dy;
- }
- let speed=player.speed;
- if(now<player.speedUntil)speed*=1.65;
- if(player.dash>0)speed*=2.8;
- moveEntity(player,dx*speed,dy*speed,player.size);
-
- // Collect crystals.
- for(let i=gems.length-1;i>=0;i--){
-  if(dist(player,gems[i])<player.size+gems[i].r){
-   gems.splice(i,1);
-   player.crystals++;
-   burst(player.x,player.y,"#80f5ff",7);
-   updateHUD();
-  }
- }
- // Optional flowers give small bonus.
- for(let i=flowers.length-1;i>=0;i--){
-  if(dist(player,flowers[i])<player.size+flowers[i].r){
-   flowers.splice(i,1);
-   player.flowers++;
-   if(player.flowers%3===0)player.magic++;
-   burst(player.x,player.y,"#ffb6ed",5);
-   updateHUD();
-  }
- }
- // Pick up dropped items.
- for(let i=drops.length-1;i>=0;i--){
-  const item=drops[i];
-  item.bob+=dt*4;
-  item.life-=dt;
-  if(dist(player,item)<player.size+item.r){
-   collectDrop(item);
-   drops.splice(i,1);
-  }else if(item.life<=0){
-   drops.splice(i,1);
-  }
- }
-
- // Monsters chase when close enough; otherwise patrol.
- for(let i=enemies.length-1;i>=0;i--){
-  const e=enemies[i];
-  if(e.hp<=0){enemies.splice(i,1);continue}
-  e.flash=Math.max(0,e.flash-dt);
-  e.attackTimer=Math.max(0,e.attackTimer-dt);
-  const d=dist(player,e);
-
-  if(d<300)e.active=true;
-  if(d>390)e.active=false;
-
-  if(e.active){
-   const vx=(player.x-e.x)/(d||1);
-   const vy=(player.y-e.y)/(d||1);
-   moveEntity(e,vx*e.speed,vy*e.speed,e.r);
-  }else{
-   e.patrol+=dt;
-   moveEntity(e,Math.cos(e.patrol)*e.speed*0.4,
-                 Math.sin(e.patrol*0.8)*e.speed*0.4,e.r);
-  }
-  if(d<player.size+e.r){
-   damagePlayer();
-   if(e.attackTimer<=0)e.attackTimer=0.8;
-  }
- }
-
- // Final boss.
- if(boss&&boss.hp>0){
-  boss.flash=Math.max(0,boss.flash-dt);
-  boss.attackTimer-=dt;
-  const d=dist(player,boss);
-  const vx=(player.x-boss.x)/(d||1);
-  const vy=(player.y-boss.y)/(d||1);
-  moveEntity(boss,vx*boss.speed,vy*boss.speed,boss.r);
-
-  if(d<player.size+boss.r){
-   damagePlayer();
-  }
-  // Boss summons minions occasionally.
-  if(boss.attackTimer<=0&&enemies.length<4){
-   spawnEnemy(false,boss.x+rand(-40,40),boss.y+rand(-40,40));
-   boss.attackTimer=4;
-   showMessage("The Boss summons a guardian!",1.3);
-  }
- }
-
- // Move magic projectiles and detect hits.
- for(let i=shots.length-1;i>=0;i--){
-  const s=shots[i];
-  s.x+=s.vx;
-  s.y+=s.vy;
-  s.life-=dt;
-  let hit=false;
-  for(const e of enemies){
-   if(e.hp>0&&dist(s,e)<s.r+e.r){
-    e.hp--;
-    e.flash=0.15;
-    burst(e.x,e.y,"#c9a7ff",5);
-    if(e.hp<=0)defeatEnemy(e);
-    hit=true;break;
-   }
-  }
-  if(!hit&&boss&&boss.hp>0&&dist(s,boss)<s.r+boss.r){
-   boss.hp--;
-   boss.flash=0.18;
-   burst(boss.x,boss.y,"#ff9de2",7);
-   hit=true;
-   if(boss.hp<=0){
-    boss.hp=0;
-    for(let i=0;i<5;i++)spawnDrop(boss.x+rand(-25,25),boss.y+rand(-25,25));
-    burst(boss.x,boss.y,"#ffe89b",40);
-    showMessage("The Forest Guardian is defeated!",3);
-   }
-  }
-  if(hit||s.life<=0||s.x<0||s.x>W||s.y<0||s.y>H){
-   shots.splice(i,1);
-  }
- }
-
- for(let i=particles.length-1;i>=0;i--){
-  const p=particles[i];
-  p.x+=p.vx;p.y+=p.vy;p.life-=dt;
-  if(p.life<=0)particles.splice(i,1);
- }
-
- portal.open = gems.length===0;
- if(level===7&&boss&&boss.hp>0)portal.open=false;
-
- if(portal.open&&dist(player,portal)<player.size+portal.r){
-  if(level<7){
-   makeLevel(level+1);
-  }else{
-   gameState="won";
-   showMessage("✨ You saved the Enchanted Forest! ✨",999);
-  }
- }
- updateHUD();
-}
-
-function draw(){
- const realm=realms[level];
- ctx.fillStyle=realm.bg;
- ctx.fillRect(0,0,W,H);
-
- // Ground details.
- for(let x=10;x<W;x+=40){
-  for(let y=10;y<H;y+=40){
-   ctx.globalAlpha=0.10;
-   ctx.fillStyle=realm.wall;
-   ctx.fillRect(x,y,2,2);
-  }
- }
- ctx.globalAlpha=1;
-
- // Obstacles.
- for(const w of walls){
-  ctx.fillStyle=realm.wall;
-  ctx.fillRect(w.x,w.y,w.w,w.h);
-  ctx.strokeStyle="rgba(255,255,255,.15)";
-  ctx.strokeRect(w.x,w.y,w.w,w.h);
- }
-
- // Flowers.
- for(const f of flowers){
-  const bob=Math.sin(f.bob+=0.025)*2;
-  ctx.font="19px sans-serif";
-  ctx.textAlign="center";
-  ctx.fillText("🌸",f.x,f.y+bob+6);
- }
-
- // Crystals.
- for(const g of gems){
-  const bob=Math.sin(g.bob+=0.04)*3;
-  ctx.save();
-  ctx.translate(g.x,g.y+bob);
-  ctx.rotate(Math.PI/4);
-  ctx.fillStyle="#7df5ff";
-  ctx.shadowColor="#7df5ff";
-  ctx.shadowBlur=13;
-  ctx.fillRect(-7,-7,14,14);
-  ctx.restore();
-  ctx.shadowBlur=0;
- }
-
- // Portal.
- ctx.beginPath();
- ctx.arc(portal.x,portal.y,portal.r+4,0,Math.PI*2);
- ctx.fillStyle=portal.open?"#b8ffdb":"#53486b";
- ctx.fill();
- ctx.beginPath();
- ctx.arc(portal.x,portal.y,portal.r-5,0,Math.PI*2);
- ctx.fillStyle=portal.open?"#4ef6c1":"#26213d";
- ctx.fill();
- ctx.font="23px sans-serif";
- ctx.textAlign="center";
- ctx.fillText(portal.open?"✨":"🔒",portal.x,portal.y+8);
-
- // Drops.
- for(const item of drops){
-  const info=itemInfo[item.type];
-  const bob=Math.sin(item.bob)*4;
-  ctx.beginPath();
-  ctx.arc(item.x,item.y+bob,item.r+5,0,Math.PI*2);
-  ctx.fillStyle="#fff5a8";
-  ctx.globalAlpha=0.25;
-  ctx.fill();
-  ctx.globalAlpha=1;
-  ctx.font="23px sans-serif";
-  ctx.fillText(info.emoji,item.x,item.y+bob+8);
- }
-
- // Enemies.
- for(const e of enemies){
-  if(e.hp<=0)continue;
-  ctx.font="29px sans-serif";
-  ctx.fillText(e.flash>0?"💥":"👾",e.x,e.y+9);
-  drawBar(e.x-17,e.y-24,34,e.hp/e.maxHp);
- }
-
- // Boss.
- if(boss&&boss.hp>0){
-  ctx.font="54px sans-serif";
-  ctx.fillText(boss.flash>0?"💥":"🐉",boss.x,boss.y+18);
-  drawBar(boss.x-40,boss.y-42,80,boss.hp/boss.maxHp);
-  ctx.fillStyle="white";
-  ctx.font="14px sans-serif";
-  ctx.fillText("FOREST GUARDIAN",boss.x,boss.y-49);
- }
-
- // Magic projectiles.
- for(const s of shots){
-  ctx.beginPath();
-  ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
-  ctx.fillStyle="#e5a6ff";
-  ctx.shadowColor="#cf75ff";
-  ctx.shadowBlur=15;
-  ctx.fill();
-  ctx.shadowBlur=0;
- }
-
- // Player.
- if(player.invuln>0&&Math.floor(performance.now()/100)%2===0){
-  ctx.globalAlpha=0.45;
- }
- ctx.beginPath();
- ctx.arc(player.x,player.y,player.size,0,Math.PI*2);
- ctx.fillStyle="#f4d7ff";
- ctx.shadowColor="#d89cff";
- ctx.shadowBlur=14;
- ctx.fill();
- ctx.shadowBlur=0;
- ctx.font="24px sans-serif";
- ctx.fillText("🧙",player.x,player.y+8);
- ctx.globalAlpha=1;
-
- if(performance.now()<player.shieldUntil){
-  ctx.beginPath();
-  ctx.arc(player.x,player.y,player.size+8,0,Math.PI*2);
-  ctx.strokeStyle="#8cf5ff";
-  ctx.lineWidth=3;
-  ctx.stroke();
- }
-
- // Particles.
- for(const p of particles){
-  ctx.globalAlpha=clamp(p.life,0,1);
-  ctx.fillStyle=p.color;
-  ctx.fillRect(p.x,p.y,4,4);
- }
- ctx.globalAlpha=1;
-
- if(!portal.open){
-  ctx.fillStyle="rgba(0,0,0,.55)";
-  ctx.fillRect(12,H-32,245,22);
-  ctx.fillStyle="#fff";
-  ctx.font="13px sans-serif";
-  ctx.textAlign="left";
-  ctx.fillText(
-   level===7&&boss&&boss.hp>0
-    ?"Defeat the Forest Guardian!"
-    :"Collect all crystals to open the portal",
-   20,H-17
-  );
- }
-
- if(gameState==="dead"||gameState==="won"){
-  ctx.fillStyle="rgba(8,8,25,.58)";
-  ctx.fillRect(0,0,W,H);
-  ctx.fillStyle="white";
-  ctx.textAlign="center";
-  ctx.font="bold 34px system-ui";
-  ctx.fillText(gameState==="won"?"FOREST SAVED!":"GAME OVER",W/2,H/2-10);
-  ctx.font="18px system-ui";
-  ctx.fillText("Press Restart to play again",W/2,H/2+27);
- }
-}
-
-function drawBar(x,y,w,p){
- ctx.fillStyle="#30273e";
- ctx.fillRect(x,y,w,5);
- ctx.fillStyle="#ff6c9c";
- ctx.fillRect(x,y,w*clamp(p,0,1),5);
-}
-
-function updateHUD(){
- $("level").textContent=`Realm ${level+1} / 8 — ${realms[level].name}`;
- $("hp").textContent="❤️".repeat(player.hp)+"🖤".repeat(player.maxHp-player.hp);
- $("crystals").textContent=`💎 ${player.crystals}`;
- $("magic").textContent=`🔮 ${player.magic}`;
- const now=performance.now();
- let items=[];
- if(now<player.speedUntil)items.push("⚡");
- if(now<player.shieldUntil)items.push("🛡️");
- $("inventory").textContent="Items: "+(items.join(" ")||"—");
-}
-
-function frame(now){
- const dt=Math.min((now-lastTime)/1000||0,0.04);
- lastTime=now;
- if(messageTimer>0){
-  messageTimer-=dt;
-  if(messageTimer<=0)$("message").textContent="";
- }
- update(dt,now);
- draw();
- requestAnimationFrame(frame);
-}
-
-window.addEventListener("keydown",e=>{
- const k=e.key;
- if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," ","Shift"].includes(k))
-  e.preventDefault();
- keys[k]=true;
- if(!e.repeat){
-  if(k===" "||k==="Shift")dash();
-  if(k.toLowerCase()==="f")attack();
- }
-});
-window.addEventListener("keyup",e=>{keys[e.key]=false});
-
-canvas.addEventListener("click",attack);
-
-document.querySelectorAll("[data-key]").forEach(btn=>{
- const k=btn.dataset.key;
- btn.addEventListener("pointerdown",e=>{
-  e.preventDefault();
-  keys[k]=true;
-  if(k===" ")dash();
-  if(k==="f")attack();
- });
- const release=e=>{keys[k]=false};
- btn.addEventListener("pointerup",release);
- btn.addEventListener("pointerleave",release);
- btn.addEventListener("pointercancel",release);
-});
-
-$("restart").addEventListener("click",()=>makeLevel(0));
-
-makeLevel(0);
-requestAnimationFrame(frame);
-</script>
-</body>
-</html>
+let level=0,player, enemies=[],gems=[],drops=[],shots=[],particles=[],walls=[],portal={},boss=null,keys={},gameState='menu',last=0,now=0,msgTimer=0,sound=true,audio=null,unlocked=1,elapsed=0,musicTimer=null,musicStep=0,crystalGoal=0;
+try{unlocked=Math.max(1,Math.min(12,Number(localStorage.getItem('neolaUnlocked')||1)))}catch(e){}
+const rand=(a,b)=>a+Math.random()*(b-a),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+function say(t,secs=2){$('message').textContent=t;msgTimer=secs}
+function tone(freq=440,dur=.12){if(!sound)return;try{audio=audio||new(window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume();let o=audio.createOscillator(),g=audio.createGain();o.frequency.value=freq;g.gain.value=.035;o.connect(g);g.connect(audio.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+dur);o.stop(audio.currentTime+dur)}catch(e){}}
+// Original cinematic soundtrack: generated in-browser; no external or copyrighted tracks.
+let musicMaster=null,musicBuses={},musicScene='normal',musicBar=0,musicNext=0,musicVolume=.48;
+const musicThemes={normal:{bpm:82,root:110,scale:[0,3,7,10,12,15,19]},boss:{bpm:118,root:73.42,scale:[0,2,5,7,9,12,14]},victory:{bpm:92,root:130.81,scale:[0,4,7,11,12,16,19]}};
+function initMusic(){audio=audio||new(window.AudioContext||window.webkitAudioContext)();if(!musicMaster){musicMaster=audio.createGain();musicMaster.gain.value=0;musicMaster.connect(audio.destination);for(const n of Object.keys(musicThemes)){musicBuses[n]=audio.createGain();musicBuses[n].gain.value=n===musicScene?1:0;musicBuses[n].connect(musicMaster)}}return true}
+function musicNote(scene,freq,t,len,type='triangle',vol=.035){const o=audio.createOscillator(),g=audio.createGain(),f=audio.createBiquadFilter();o.type=type;o.frequency.setValueAtTime(Math.max(20,freq),t);f.type='lowpass';f.frequency.value=scene==='boss'?2100:3200;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(vol,t+.12);g.gain.setValueAtTime(vol,t+len*.65);g.gain.exponentialRampToValueAtTime(.0001,t+len);o.connect(f);f.connect(g);g.connect(musicBuses[scene]);o.start(t);o.stop(t+len+.02)}
+function musicDrum(scene,t,vol){const o=audio.createOscillator(),g=audio.createGain();o.type='sine';o.frequency.setValueAtTime(105,t);o.frequency.exponentialRampToValueAtTime(38,t+.2);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+.23);o.connect(g);g.connect(musicBuses[scene]);o.start(t);o.stop(t+.25)}
+function scheduleMusicBar(){const n=musicScene,th=musicThemes[n],beat=60/th.bpm,barLen=beat*4,t=musicNext;musicNote(n,th.root/2,t,barLen*.96,'triangle',n==='boss'?.085:.05);musicNote(n,th.root,t,barLen*.9,'sine',.045);const chords=n==='victory'?[[0,4,7],[7,11,14],[5,9,12],[0,4,7]]:[[0,3,7],[5,8,12],[3,7,10],[0,5,7]];chords[musicBar%4].forEach((v,i)=>musicNote(n,th.root*Math.pow(2,(v+12)/12),t+i*.045,barLen*.82,n==='boss'?'sawtooth':'triangle',n==='boss'?.024:.03));const count=n==='boss'?8:4;for(let i=0;i<count;i++){const step=th.scale[(musicBar*2+i*2+(n==='victory'?2:0))%th.scale.length];musicNote(n,th.root*Math.pow(2,(step+(n==='boss'?24:36))/12),t+i*barLen/count,n==='boss'?beat*.8:beat*1.35,'triangle',n==='boss'?.043:.032)}for(let i=0;i<4;i++){if(n==='boss')musicDrum(n,t+i*beat,i%2===0?.12:.065);else if(n==='victory'&&i%2===0)musicDrum(n,t+i*beat,.04)}musicBar++;musicNext+=barLen}
+function musicTick(){if(!sound||!audio||!musicMaster)return;while(musicNext<audio.currentTime+.35)scheduleMusicBar()}
+function setMusicScene(scene){if(!musicThemes[scene])return;musicScene=scene;if(!audio||!musicMaster)return;const t=audio.currentTime;for(const n of Object.keys(musicBuses)){musicBuses[n].gain.cancelScheduledValues(t);musicBuses[n].gain.setTargetAtTime(n===scene?1:0,t,.8)}musicNext=Math.max(musicNext,audio.currentTime+.06)}
+function startMusic(){if(!sound)return;try{initMusic();if(audio.state==='suspended')audio.resume();if(musicTimer===null){musicNext=audio.currentTime+.08;musicBar=0;musicTimer=setInterval(musicTick,100);musicTick()}musicMaster.gain.cancelScheduledValues(audio.currentTime);musicMaster.gain.setTargetAtTime(musicVolume,audio.currentTime,.8);setMusicScene(level===11?'boss':'normal')}catch(e){console.warn('Music could not start in this browser.',e)}}
+function stopMusic(){if(musicTimer!==null){clearInterval(musicTimer);musicTimer=null}if(audio&&musicMaster){musicMaster.gain.cancelScheduledValues(audio.currentTime);musicMaster.gain.setTargetAtTime(0,audio.currentTime,.18)}}
+function resetPlayer(){return{x:54,y:300,r:15,hp:3,maxHp:3,speed:205,magic:10,crystals:0,invuln:0,dash:0,dashCD:0,attackCD:0,speedUntil:0,shieldUntil:0,freezeUntil:0,luckUntil:0,faceX:1,faceY:0,potions:1,bombs:3}}
+function collides(x,y,r){if(x-r<10||x+r>950||y-r<10||y+r>590)return true;return walls.some(w=>x+r>w.x&&x-r<w.x+w.w&&y+r>w.y&&y-r<w.y+w.h)}
+function move(e,dx,dy,r){if(!collides(e.x+dx,e.y,r))e.x+=dx;if(!collides(e.x,e.y+dy,r))e.y+=dy}
+function safePos(min=100){for(let i=0;i<160;i++){let p={x:rand(45,915),y:rand(45,555)};if(!collides(p.x,p.y,17)&&dist(p,player)>min)return p}return{x:800,y:300}}
+function makeWalls(){walls=[];for(let i=0;i<5+level;i++){let x=rand(130,820),y=rand(50,530),w=rand(24,52),h=rand(24,48);if(x<180||x>790)continue;let candidate={x,y,w,h};if(!(x<220&&y>220&&y<380))walls.push(candidate)}}
+function makeLevel(n){level=n;gameState='playing';player=resetPlayer();enemies=[];gems=[];drops=[];shots=[];particles=[];boss=null;elapsed=0;makeWalls();const data=realms[level];crystalGoal=level===11?Math.floor(rand(10,16)):data.crystals;
+ for(let i=0;i<crystalGoal;i++){let p=safePos(140);gems.push({...p,r:10,bob:rand(0,6)})}
+ if(level<11){for(let i=0;i<data.foes;i++)spawnEnemy()}else{let p=safePos(270);boss={...p,r:34,hp:26,maxHp:26,speed:62+level*3,flash:0,spawnCD:4,shotCD:2.5,guardiansSummoned:0}}
+ portal={x:900,y:300,r:25,open:false};setMusicScene(level===11?'boss':'normal');$('realmName').textContent=data.emoji+' '+data.name;$('goalText').textContent=level===11?'Collect 10–15 crystals + monster drops; defeat the Dragon':'Gather all crystals';$('questText').textContent=level===11?'Collect all 10–15 crystals. Each small monster drops 1 extra crystal when defeated. Defeat the Forest Dragon and enter the portal!':'Gather '+data.crystals+' crystals, evade monsters, and reach the portal.';say('Welcome to '+data.name+'!',2.5);updateHUD();renderLevelGrid()}
+function spawnEnemy(x=null,y=null){let p=x===null?safePos(140):{x,y};enemies.push({x:p.x,y:p.y,r:14,hp:2+Math.floor(level/4),maxHp:2+Math.floor(level/4),speed:49+level*5+rand(0,15),active:false,phase:rand(0,7),flash:0})}
+function dropCrystal(x,y){if(level!==11)return;crystalGoal++;gems.push({x:clamp(x,25,935),y:clamp(y,25,575),r:10,bob:rand(0,6)});say('💎 The little monster dropped a crystal! Collect it!',1.6);}
+const itemInfo={health:['❤️','Health Potion'],speed:['⚡','Swift Elixir'],magic:['🔮','Mana Orb'],shield:['🛡️','Aegis Shield'],crystal:['💎','Crystal Shard'],bomb:['💥','Arcane Bomb'],freeze:['❄️','Frost Rune'],star:['🌟','Starlight'],heart:['💖','Heart Charm'],luck:['🍀','Fortune Charm']};
+function dropItem(x,y){if(Math.random()<(now<player.luckUntil?.98:.78)){const pool=['health','speed','magic','shield','crystal','bomb','freeze','star','heart','luck'];let type=pool[Math.floor(Math.random()*pool.length)];if(Math.random()<.22)type=pool[Math.floor(Math.random()*pool.length)];drops.push({x,y,type,r:13,bob:0,life:22,rare:Math.random()<.16})}}
+function burst(x,y,color,n=10){for(let i=0;i<n;i++){let a=rand(0,Math.PI*2),s=rand(25,150);particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:rand(.3,.8),max:.8,color,size:rand(2,5)})}}
+function pickup(it){const info=itemInfo[it.type];if(it.type==='health'){player.hp=Math.min(3,player.hp+1);say('❤️ Health restored!')}else if(it.type==='speed'){player.speedUntil=now+7500;say('⚡ Swift Elixir! Speed boosted.')}else if(it.type==='magic'){player.magic+=3;say('🔮 Mana restored! +3 shots.')}else if(it.type==='shield'){player.shieldUntil=now+6500;say('🛡️ Aegis activated!')}else if(it.type==='crystal'){player.crystals+=2;say('💎 Crystal bonus! +2 crystals.')}else if(it.type==='bomb'){player.bombs++;say('💣 Bomb collected! +1 bomb.')}else if(it.type==='freeze'){player.freezeUntil=now+3500;say('❄️ Frost Rune! Foes are slowed.')}else if(it.type==='star'){player.magic+=5;player.shieldUntil=now+2500;burst(player.x,player.y,'#ffe58a',24);say('🌟 Starlight blessing! +5 mana and shield.')}else if(it.type==='heart'){player.hp=3;player.potions++;say('💖 Heart Charm! Health restored.')}else if(it.type==='luck'){player.luckUntil=now+12000;say('🍀 Fortune Charm! Better loot for a while.')}tone(720);updateHUD()}
+function hurt(){if(player.invuln>0||now<player.shieldUntil)return;player.hp--;player.invuln=1.1;burst(player.x,player.y,'#ff719c',13);tone(150,.2);if(player.hp<=0){player.hp=0;gameState='dead';$('pauseTitle').textContent='Adventure Over';$('pauseDesc').textContent='Gather your magic and try again. Your next run awaits.';$('pauseModal').classList.remove('hide');$('resumeBtn').textContent='Try Again';say('Out of health!',999)}else say('Watch out! A creature got you!',1.2);updateHUD()}
+function attack(){if(gameState!=='playing'||player.attackCD>0)return;if(player.magic<=0){say('Out of shots! Collect 💎 crystals or 🔮 Mana Orbs.',1.4);return}let targets=[...enemies.filter(e=>e.hp>0)];if(boss&&boss.hp>0)targets.push(boss);let target=null,best=Infinity;for(const e of targets){let d=dist(player,e);if(d<best){best=d;target=e}}if(!target||best>430){say('No creatures in range.',1);return}player.magic--;player.attackCD=.28;let dx=target.x-player.x,dy=target.y-player.y,len=Math.hypot(dx,dy)||1;shots.push({x:player.x,y:player.y,vx:dx/len*390,vy:dy/len*390,r:7,life:1.1});tone(560);updateHUD()}
+function dash(){if(gameState!=='playing'||player.dashCD>0)return;player.dash=.2;player.dashCD=1.1;player.invuln=Math.max(player.invuln,.25);say('⚡ Dash!',.6)}
+function usePotion(){if(gameState!=='playing')return;if(player.hp>=3){say('Health is already full!',1);return}if(player.potions>0){player.potions--;player.hp=Math.min(3,player.hp+1);say('❤️ Health Potion used!');updateHUD()}else say('No potions left. Defeat creatures to find loot.',1.5)}
+function useShield(){if(gameState!=='playing')return;player.shieldUntil=now+4500;say('🛡️ Aegis Shield activated!',1);updateHUD()}
+function useBomb(){if(gameState!=='playing')return;if(player.bombs<=0){say('No bombs left! Collect crystals to earn more.',1.5);return}player.bombs--;let hits=0;for(const e of enemies){if(e.hp>0&&dist(player,e)<230){e.hp-=3;hits++;if(e.hp<=0){dropItem(e.x,e.y);dropCrystal(e.x,e.y);burst(e.x,e.y,'#ffcf8a',14)}}}if(boss&&boss.hp>0&&dist(player,boss)<260){boss.hp-=3;boss.flash=.2;hits++;if(boss.hp<=0){boss.hp=0;for(let j=0;j<6;j++)dropItem(boss.x+rand(-35,35),boss.y+rand(-35,35));burst(boss.x,boss.y,'#ffe89b',50);say('🐉 The Final Boss has fallen!',3)}}burst(player.x,player.y,'#ffb36b',34);tone(180,.25);say('💣 Arcane Bomb! '+hits+' target'+(hits===1?'':'s')+' hit.',1.5);updateHUD()}
+function update(dt){if(gameState!=='playing')return;elapsed+=dt;player.invuln=Math.max(0,player.invuln-dt);player.dash=Math.max(0,player.dash-dt);player.dashCD=Math.max(0,player.dashCD-dt);player.attackCD=Math.max(0,player.attackCD-dt);
+ let dx=(keys.right?1:0)-(keys.left?1:0),dy=(keys.down?1:0)-(keys.up?1:0);let len=Math.hypot(dx,dy)||1;if(dx||dy){dx/=len;dy/=len;player.faceX=dx;player.faceY=dy}let speed=player.speed*(now<player.speedUntil?1.55:1)*(player.dash>0?3.0:1);move(player,dx*speed*dt,dy*speed*dt,player.r);
+ for(let i=gems.length-1;i>=0;i--){gems[i].bob+=dt*3;if(dist(player,gems[i])<player.r+gems[i].r){gems.splice(i,1);player.crystals++;player.magic++;burst(player.x,player.y,'#7df6ff',8);tone(740);say('💎 Crystal found! +1 shot.',1.1);updateHUD()}}
+ for(let i=drops.length-1;i>=0;i--){let d=drops[i];d.bob+=dt*4;d.life-=dt;if(dist(player,d)<player.r+d.r){pickup(d);drops.splice(i,1)}else if(d.life<=0)drops.splice(i,1)}
+ for(let i=enemies.length-1;i>=0;i--){let e=enemies[i];if(e.hp<=0){enemies.splice(i,1);continue}e.flash=Math.max(0,e.flash-dt);e.phase+=dt;let d=dist(player,e);if(d<360)e.active=true;if(d>460)e.active=false;if(e.active&&now>player.freezeUntil){move(e,(player.x-e.x)/(d||1)*e.speed*dt,(player.y-e.y)/(d||1)*e.speed*dt,e.r)}else move(e,Math.cos(e.phase)*e.speed*.25*dt,Math.sin(e.phase*.8)*e.speed*.25*dt,e.r);if(d<player.r+e.r)hurt()}
+ if(boss&&boss.hp>0&&now>player.freezeUntil){boss.flash=Math.max(0,boss.flash-dt);boss.spawnCD-=dt;boss.shotCD-=dt;let d=dist(player,boss);move(boss,(player.x-boss.x)/(d||1)*boss.speed*dt,(player.y-boss.y)/(d||1)*boss.speed*dt,boss.r);if(d<player.r+boss.r)hurt();if(boss.spawnCD<=0&&enemies.length<4){spawnEnemy(boss.x+rand(-40,40),boss.y+rand(-40,40));boss.spawnCD=5;say('🐉 The Dragon summoned its guardians!',1.2)}if(boss.shotCD<=0){let dx=player.x-boss.x,dy=player.y-boss.y,l=Math.hypot(dx,dy)||1;shots.push({x:boss.x,y:boss.y,vx:dx/l*180,vy:dy/l*180,r:9,life:2,bad:true});boss.shotCD=2.7}}
+ for(let i=shots.length-1;i>=0;i--){let s=shots[i];s.x+=s.vx*dt;s.y+=s.vy*dt;s.life-=dt;let hit=false;if(s.bad){if(dist(player,s)<player.r+s.r){hurt();hit=true}}else{for(let e of enemies){if(e.hp>0&&dist(s,e)<s.r+e.r){e.hp--;e.flash=.15;burst(e.x,e.y,'#c9a7ff',5);if(e.hp<=0){dropItem(e.x,e.y);dropCrystal(e.x,e.y);burst(e.x,e.y,'#e6b6ff',14)}hit=true;break}}if(!hit&&boss&&boss.hp>0&&dist(s,boss)<s.r+boss.r){boss.hp--;boss.flash=.18;burst(boss.x,boss.y,'#ff9de2',8);hit=true;if(boss.hp<=0){boss.hp=0;for(let j=0;j<6;j++)dropItem(boss.x+rand(-35,35),boss.y+rand(-35,35));burst(boss.x,boss.y,'#ffe89b',50);say('🐉 The Final Boss has fallen!',3)}}}if(hit||s.life<=0||s.x<0||s.x>960||s.y<0||s.y>600)shots.splice(i,1)}
+ for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.985;p.vy*=.985;p.life-=dt;if(p.life<=0)particles.splice(i,1)}
+ portal.open=gems.length===0&&(level!==11||(!boss||boss.hp<=0));if(portal.open&&dist(player,portal)<player.r+portal.r){if(level<11){unlocked=Math.max(unlocked,level+2);try{localStorage.setItem('neolaUnlocked',String(unlocked))}catch(e){}makeLevel(level+1);say('✨ Realm cleansed! A new world awaits.',2)}else{gameState='won';setMusicScene('victory');$('pauseTitle').textContent='The Realms Are Saved!';$('pauseDesc').textContent='You defeated the Ancient Dragon and became the guardian of magic.';$('resumeBtn').textContent='Play Again';$('pauseModal').classList.remove('hide')}}updateHUD()}
+function draw(){let data=realms[level];ctx.clearRect(0,0,960,600);ctx.fillStyle=data.bg;ctx.fillRect(0,0,960,600);let grad=ctx.createRadialGradient(480,300,30,480,300,650);grad.addColorStop(0,data.accent+'20');grad.addColorStop(1,'#090b1a00');ctx.fillStyle=grad;ctx.fillRect(0,0,960,600);
+ for(let i=0;i<210;i++){let x=(i*137+31)%960,y=(i*223+19)%600;ctx.globalAlpha=.12+(i%4)*.025;ctx.fillStyle=i%3===0?data.accent:'#ffffff';ctx.beginPath();ctx.arc(x,y,1+(i%3),0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;
+ for(let w of walls){ctx.fillStyle='#07101d55';ctx.fillRect(w.x+4,w.y+5,w.w,w.h);ctx.fillStyle=data.accent+'38';ctx.strokeStyle=data.accent+'99';ctx.lineWidth=1.5;roundRect(w.x,w.y,w.w,w.h,9,true,true)}
+ for(let g of gems){let bob=Math.sin(g.bob)*4;ctx.save();ctx.translate(g.x,g.y+bob);ctx.rotate(Math.PI/4);ctx.shadowColor='#78f4ff';ctx.shadowBlur=15;ctx.fillStyle='#91f8ff';ctx.fillRect(-7,-7,14,14);ctx.fillStyle='#ffffff';ctx.fillRect(-3,-5,4,5);ctx.restore()}
+ ctx.save();ctx.translate(portal.x,portal.y);ctx.shadowColor=portal.open?'#9fffe1':'#8b82a9';ctx.shadowBlur=portal.open?25:8;ctx.strokeStyle=portal.open?'#9fffe1':'#8c82a8';ctx.lineWidth=6;ctx.beginPath();ctx.ellipse(0,0,22,29,0,0,Math.PI*2);ctx.stroke();ctx.fillStyle=portal.open?'#55edc555':'#19172b';ctx.beginPath();ctx.ellipse(0,0,15,22,0,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.font='21px sans-serif';ctx.textAlign='center';ctx.fillText(portal.open?'✨':'🔒',0,7);ctx.restore();
+ for(let d of drops){let info=itemInfo[d.type];ctx.beginPath();ctx.arc(d.x,d.y+Math.sin(d.bob)*3,17,0,Math.PI*2);ctx.fillStyle=d.rare?'#ffe58a55':'#fff2a522';ctx.fill();if(d.rare){ctx.strokeStyle='#ffe58a';ctx.lineWidth=2;ctx.beginPath();ctx.arc(d.x,d.y+Math.sin(d.bob)*3,21,0,Math.PI*2);ctx.stroke()}ctx.font='24px sans-serif';ctx.textAlign='center';ctx.fillText(info[0],d.x,d.y+Math.sin(d.bob)*3+8)}
+ for(let e of enemies){ctx.font='30px sans-serif';ctx.textAlign='center';ctx.fillText(e.flash>0?'💥':'👾',e.x,e.y+10);bar(e.x-17,e.y-24,34,e.hp/e.maxHp)}
+ if(boss&&boss.hp>0){ctx.font='57px sans-serif';ctx.textAlign='center';ctx.fillText(boss.flash>0?'💥':'🐉',boss.x,boss.y+19);bar(boss.x-52,boss.y-47,104,boss.hp/boss.maxHp);ctx.font='13px sans-serif';ctx.fillStyle='#fff';ctx.fillText('ANCIENT DRAGON · FINAL BOSS',boss.x,boss.y-55)}
+ for(let s of shots){ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=s.bad?'#ff8caa':'#e7a4ff';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=15;ctx.fill();ctx.shadowBlur=0}
+ for(let p of particles){ctx.globalAlpha=clamp(p.life/(p.max||.8),0,1);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,p.size,p.size)}ctx.globalAlpha=1;
+ if(!(player.invuln>0&&Math.floor(now/100)%2===0)){ctx.font='31px sans-serif';ctx.textAlign='center';ctx.fillText('🧙',player.x,player.y+10)}if(now<player.shieldUntil){ctx.strokeStyle='#8cf5ff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(player.x,player.y,player.r+10,0,Math.PI*2);ctx.stroke()}if(now<player.speedUntil){ctx.strokeStyle='#ffe58a';ctx.lineWidth=2;ctx.beginPath();ctx.arc(player.x,player.y,player.r+5,0,Math.PI*2);ctx.stroke()}
+ if(!portal.open){ctx.fillStyle='#070a18a8';roundRect(15,548,310,34,10,true,false);ctx.fillStyle='#fff';ctx.font='13px system-ui';ctx.textAlign='left';ctx.fillText(level===11?(('💎 CRYSTALS '+(crystalGoal-gems.length)+' / '+crystalGoal+' · ')+(boss&&boss.hp>0?'🐉 DEFEAT THE FINAL BOSS':'🐉 DRAGON DEFEATED · FIND THE PORTAL')):('💎 CRYSTALS '+(crystalGoal-gems.length)+' / '+crystalGoal+' · FIND THEM ALL TO OPEN THE PORTAL'),27,570)} }
+function roundRect(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill)ctx.fill();if(stroke)ctx.stroke()}function bar(x,y,w,p){ctx.fillStyle='#100f25cc';ctx.fillRect(x,y,w,5);ctx.fillStyle='#ff789f';ctx.fillRect(x,y,w*clamp(p,0,1),5)}
+function updateHUD(){$('levelText').textContent=String(level+1).padStart(2,'0')+' / 12';$('hpText').textContent='❤️'.repeat(player.hp)+'🖤'.repeat(3-player.hp);$('healthFill').style.width=(player.hp/3*100)+'%';$('crystalText').textContent='💎 '+(player.crystals)+' / '+crystalGoal;$('magicText').textContent='✨ '+player.magic;$('bombText').textContent='💣 '+player.bombs;let a=[];if(now<player.speedUntil)a.push('⚡ Swift');if(now<player.shieldUntil)a.push('🛡️ Shield');if(player.potions)a.push('❤️ Potion ×'+player.potions);if(now<player.freezeUntil)a.push('❄️ Frost');if(now<player.luckUntil)a.push('🍀 Fortune');$('itemPill').textContent='Items: '+(a.join(' · ')||'None')}
+function renderLevelGrid(){$('levelGrid').innerHTML='';realms.forEach((r,i)=>{let b=document.createElement('button');b.className='levelCard'+(i>=unlocked?' locked':'');b.innerHTML='<strong>'+ (i<unlocked?'🔓':'🔒')+' '+String(i+1).padStart(2,'0')+'</strong>'+r.emoji+' '+r.name+(i<unlocked?'<small style="display:block;margin-top:4px;color:#bcebd8">UNLOCKED</small>':'<small style="display:block;margin-top:4px;color:#d0b9ff">CLEAR PREVIOUS</small>');b.disabled=i>=unlocked;b.addEventListener('click',()=>{makeLevel(i);$('levelModal').classList.add('hide')});$('levelGrid').appendChild(b)})}
+function frame(t){now=t;let dt=Math.min((t-last)/1000||0,.04);last=t;if(msgTimer>0){msgTimer-=dt;if(msgTimer<=0)$('message').textContent=''}update(dt);draw();requestAnimationFrame(frame)}
+window.addEventListener('keydown',e=>{let k=e.key.toLowerCase();if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();if(k==='w'||k==='arrowup')keys.up=true;if(k==='s'||k==='arrowdown')keys.down=true;if(k==='a'||k==='arrowleft')keys.left=true;if(k==='d'||k==='arrowright')keys.right=true;if(!e.repeat){if(k===' ')dash();if(k==='f')attack();if(k==='b')useBomb();if(k==='escape')togglePause()}});window.addEventListener('keyup',e=>{let k=e.key.toLowerCase();if(k==='w'||k==='arrowup')keys.up=false;if(k==='s'||k==='arrowdown')keys.down=false;if(k==='a'||k==='arrowleft')keys.left=false;if(k==='d'||k==='arrowright')keys.right=false});window.addEventListener('blur',()=>{keys={}});
+document.querySelectorAll('[data-dir]').forEach(b=>{let d=b.dataset.dir;const on=e=>{e.preventDefault();keys[d]=true};const off=e=>{e.preventDefault();keys[d]=false};b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('pointerleave',off);b.addEventListener('contextmenu',e=>e.preventDefault())});canvas.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')attack()});$('touchAttack').addEventListener('pointerdown',e=>{e.preventDefault();attack()});$('touchDash').addEventListener('pointerdown',e=>{e.preventDefault();dash()});$('touchPotion').addEventListener('pointerdown',e=>{e.preventDefault();usePotion()});$('touchShield').addEventListener('pointerdown',e=>{e.preventDefault();useShield()});$('touchBomb').addEventListener('pointerdown',e=>{e.preventDefault();useBomb()});
+function togglePause(){if(gameState==='playing'){gameState='paused';$('pauseTitle').textContent='Adventure Paused';$('pauseDesc').textContent='Take a breath. The realms will be waiting.';$('resumeBtn').textContent='Resume';$('pauseModal').classList.remove('hide')}else if(gameState==='paused'){$('pauseModal').classList.add('hide');gameState='playing'}}
+$('startBtn').addEventListener('click',()=>{$('homeModal').classList.add('hide');makeLevel(0);gameState='playing';startMusic()});$('levelsBtn').addEventListener('click',()=>{$('levelModal').classList.remove('hide');renderLevelGrid()});$('closeLevels').addEventListener('click',()=>$('levelModal').classList.add('hide'));$('pauseBtn').addEventListener('click',togglePause);$('resumeBtn').addEventListener('click',()=>{if(gameState==='dead'||gameState==='won'){unlocked=Math.max(1,unlocked);makeLevel(0)}$('pauseModal').classList.add('hide');gameState='playing'});$('pauseRestart').addEventListener('click',()=>{makeLevel(level);$('pauseModal').classList.add('hide')});$('restartBtn').addEventListener('click',()=>makeLevel(level));$('bombBtn').addEventListener('click',useBomb);$('soundBtn').addEventListener('click',()=>{sound=!sound;$('soundBtn').textContent=sound?'🎵':'🔇';if(sound){tone(500);startMusic()}else{stopMusic()}});
+$('soundBtn').textContent='🎵';player=resetPlayer();renderLevelGrid();updateHUD();draw();requestAnimationFrame(frame);
+})();
+</script></body></html>
